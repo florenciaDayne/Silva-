@@ -1,31 +1,34 @@
 <?php
 
-// Crear conexion a la bazse de datos
-$conexion = new mysqli("localhost", "root", "rootroot", "Silva");
+$conexion = new mysqli("localhost", "root", "User.sede", "Silva");
 
-//Verificar si hubo error al conectar 
-if ($conexion ->connect_error) {
-    die("Error de conexion: ". $conexion->connect_error);
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
 }
 
-//Obetener datos enviados desde el formulario 
-$nombre = $_POST['nombre'] ?? ''; // si no existe, queda vacio
+$nombre = $_POST['nombre'] ?? '';
 $apellidop = $_POST['apellidop'] ?? '';
 $apellidom = $_POST['apellidom'] ?? '';
 
-//Validar que no esten vacios 
-if (empty($nombre) || empty($apellidop) || empty($apellidom)) { 
-    die("X Todos los campos son obligatoriosz");
+if (empty($nombre) || empty($apellidop) || empty($apellidom)) {
+    die("Todos los campos son obligatorios");
 }
 
-//Preparar consulte SQL segura (evita hackeos)
-$stmt = $conexion->prepare("INSERT INTO datos (nombre, apellidop, apellidom")
+$stmt = $conexion->prepare("INSERT INTO datos (nombre, apellidop, apellidom) VALUES (?, ?, ?)");
 
-//Vincular variables a la consulta 
+if (!$stmt) {
+    die("Error en la consulta: " . $conexion->error);
+}
+
 $stmt->bind_param("sss", $nombre, $apellidop, $apellidom);
-// "sss" significa que los 3 valores son strings 
 
-//Ejecuta<r la consulta 
-if ($stms->execute()) { 
-    
+if ($stmt->execute()) {
+    echo "Datos guardados correctamente";
+} else {
+    echo "Error al guardar: " . $stmt->error;
+}
 
+$stmt->close();
+$conexion->close();
+
+?>
